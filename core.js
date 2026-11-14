@@ -41,7 +41,7 @@ function evaluate(input,allocations){validate(input);if(!Array.isArray(allocatio
  const valid=errors.length===0;
  // Invalid arithmetic remains diagnostic, never presented as a feasible coverage result.
  if(!valid)for(const r of rows){r.after=null;r.shortfall=null;r.usage=null;}
- return {valid,errors,checks,rows,products:products.map(p=>valid?p:{...p,knownShortfall:null}),completeCounts:checks.length===0,rule:'Proportional to known verified target deficits; largest remainder, ties in station order. Not a fairness or optimality claim.'};
+ return {valid,errors,checks,rows,products:products.map(p=>valid?p:{...p,knownShortfall:null}),completeCounts:checks.length===0,rule:'Suggestion rule only: proportional to known verified target deficits; largest remainder, ties in station order. The quantities below are the supplied plan and may differ from the suggestion. Not a fairness or optimality claim.'};
 }
 function snapshot(input,allocations){const result=evaluate(input,allocations);const lines=['RoundReady — PREVIEW ONLY','Packing/check plan, NOT confirmation of physical restocking.','Synthetic or operator-entered aggregate counts; no individual health information.'];
  if(!result.valid)return lines.concat('INVALID PLAN — do not use for packing.',...result.errors).join('\n');
