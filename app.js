@@ -9,7 +9,7 @@ const invalidFields=new Set();
 function clearInvalid(){for(const id of invalidFields){$(id).removeAttribute('aria-invalid');$(id).removeAttribute('aria-describedby');}invalidFields.clear();}
 function invalid(ids,text){for(const id of ids){$(id).setAttribute('aria-invalid','true');$(id).setAttribute('aria-describedby','errors');invalidFields.add(id);}throw new Error(text);}
 function context(id){const b=id.split('-');return b.length===2?model.products[Number(b[1])].name:model.stations[Number(b[1])].name+' / '+model.products[Number(b[2])].name;}
-function read(id,blank=false){const e=$(id);if(e.value===''&&blank)return null;const n=e.value===''?NaN:Number(e.value);if(!Number.isSafeInteger(n)||n<0||n>10000)invalid([id],context(id)+' / '+e.parentNode.textContent+': enter a whole number from 0 to 10,000.');return n;}
+function read(id,blank=false){const e=$(id);if(e.validity?.badInput)invalid([id],context(id)+': finish entering a valid whole number or clear the field.');if(e.value===''&&blank)return null;const n=e.value===''?NaN:Number(e.value);if(!Number.isSafeInteger(n)||n<0||n>10000)invalid([id],context(id)+' / '+e.parentNode.textContent+': enter a whole number from 0 to 10,000.');return n;}
 function readInput(){clearInvalid();const x=JSON.parse(JSON.stringify(model));x.products.forEach((p,j)=>{p.available=read('available-'+j);p.pending=read('pending-'+j);});x.stations.forEach((s,k)=>s.items.forEach((i,j)=>{const key=k+'-'+j,label=s.name+' / '+x.products[j].name;
  i.current=read('current-'+key,true);i.verified=$('verified-'+key).checked;i.capacity=read('capacity-'+key);i.target=read('target-'+key);
  if(i.target>i.capacity)invalid(['target-'+key,'capacity-'+key],label+': target exceeds capacity. Adjust the target or capacity.');

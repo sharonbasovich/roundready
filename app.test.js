@@ -16,3 +16,19 @@ test('caught initial evaluation or snapshot failure does not mark startup ready'
 test('successful initialization enables actions only with a valid packing preview',()=>{const t=setup();assert.equal(t.ids['startup-notice'].hidden,true);for(const id of ['example','reset','suggest','download'])assert.equal(t.ids[id].disabled,false);assert.match(t.ids.snapshot.value,/PREVIEW ONLY/);t.input('available-0','');assert.equal(t.ids.download.disabled,true);t.input('available-0','12');assert.equal(t.ids.download.disabled,false);});
 
 test('partial DOM build failure retains fail-closed state',()=>{const t=setup({failCreateAt:12});assert(t.ids.stock.children.length>0);for(const id of ['example','reset','suggest','download'])assert.equal(t.ids[id].disabled,true);assert.equal(t.ids['startup-notice'].hidden,false);assert.doesNotMatch(t.ids.snapshot.value,/DOM construction failed/);});
+
+// Model the standardized badInput state independently of sanitized .value.
+test('bad numeric UI input is not an intentional blank optional count or usage',()=>{
+ for(const id of ['current-2-0','low-1-0','high-1-0']){
+  const t=setup();t.ids[id].validity={badInput:true};t.input(id,'');
+  assert.equal(t.ids.download.disabled,true,id);
+  assert.equal(t.ids[id].attrs['aria-invalid'],'true');
+  assert.equal(t.ids[id].attrs['aria-describedby'],'errors');
+  assert.match(t.ids.errors.textContent,/finish entering a valid whole number/);
+  t.ids.suggest.click();assert.equal(t.ids.download.disabled,true);
+  t.ids.download.click();assert.equal(t.downloads.length,0);
+  t.ids[id].validity.badInput=false;t.input(id,'');
+  assert.equal(t.ids.download.disabled,false,'intentional blank recovers');
+  assert.equal(t.ids[id].attrs['aria-invalid'],undefined);
+ }
+});
